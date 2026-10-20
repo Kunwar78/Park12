@@ -1,0 +1,218 @@
+:root {
+  --purple: #6b2a6e;
+  --purple-dark: #4f1f52;
+  --text: #2b2b2b;
+  --muted: #5a5a5a;
+  --border: #cfcfcf;
+  --focus: #7fb6e8;
+  --footer-dark: #3d3d3d;
+  --bg: #ffffff;
+  --red: #c0392b;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a { color: var(--purple); }
+a:hover { text-decoration: underline; }
+
+/* ── Header ── */
+header.site-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 32px;
+  border-bottom: 4px solid #111;
+  background: #fff;
+}
+.site-title .name { font-size: 1.5rem; font-weight: 700; letter-spacing: 0.5px; }
+.site-title .sub  { font-size: 0.75rem; letter-spacing: 2px; color: var(--muted); }
+
+/* ── Purple band ── */
+.band { background: var(--purple); height: 60px; }
+
+/* ── Main ── */
+main { flex: 1; max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; width: 100%; }
+
+/* ── Headings ── */
+h1 { color: var(--purple); font-weight: 300; font-size: 2.4rem; margin: 0 0 20px; letter-spacing: -0.5px; }
+h1 u, h2 u { text-decoration-style: dotted; }
+h2 { color: var(--purple); font-weight: 300; font-size: 1.6rem; margin: 36px 0 20px; }
+h3 { color: var(--purple); font-weight: 300; font-size: 1.2rem; margin: 20px 0 10px; }
+
+/* ── Lead paragraph ── */
+p.lead { font-size: 1.05rem; margin-bottom: 28px; }
+
+/* ── Info notices ── */
+.notice { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; font-size: 1rem; }
+.notice .icon {
+  flex-shrink: 0; width: 22px; height: 22px;
+  border-radius: 50%; background: #2f6fb3; color: #fff;
+  font-size: 0.8rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  transform: rotate(45deg);
+}
+.notice .icon span { transform: rotate(-45deg); }
+.req { color: var(--red); font-weight: 700; }
+
+/* ── Form ── */
+form .field-row {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 620px; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;
+}
+form label { font-size: 1rem; }
+form input[type="text"] {
+  width: 240px; max-width: 100%;
+  padding: 10px 12px; font-size: 1rem;
+  border: 1px solid var(--border); border-radius: 2px;
+  background: var(--bg); color: var(--text);
+}
+form input[type="text"]:focus {
+  outline: none; border-color: var(--focus);
+  box-shadow: 0 0 0 2px rgba(127,182,232,0.4);
+}
+.actions { margin-top: 20px; text-align: right; max-width: 620px; }
+button.search-btn {
+  background: var(--purple); color: #fff; border: none;
+  padding: 12px 36px; font-size: 1rem; border-radius: 3px; cursor: pointer;
+}
+button.search-btn:hover { background: var(--purple-dark); }
+
+/* ── Error text ── */
+.error-text { display: none; color: var(--red); font-size: 0.9rem; margin-top: -8px; margin-bottom: 16px; }
+.error-text.show { display: block; }
+.err { color: var(--red); font-size: 0.9rem; margin-bottom: 12px; }
+
+/* ── Steps bar ── */
+.steps {
+  display: flex; list-style: none;
+  margin-bottom: 28px; border-bottom: 2px solid var(--border);
+}
+.step {
+  flex: 1; text-align: center; padding: 10px 6px;
+  font-size: 13px; background: #f5f5f5; color: var(--muted);
+  border-right: 1px solid var(--border);
+}
+.step:last-child { border-right: none; }
+.step.active { background: var(--purple); color: #fff; font-weight: bold; }
+.step.done   { background: #2f6fb3; color: #fff; }
+
+/* ── Definition list ── */
+dl.details { margin-bottom: 24px; display: grid; grid-template-columns: auto 1fr; gap: 0; }
+dt { font-weight: normal; color: var(--text); padding: 6px 40px 6px 0; font-size: 15px;
+     border: none; white-space: nowrap; }
+dd { color: var(--text); padding: 6px 0; border: none; font-size: 15px; margin: 0; }
+dd.amount { font-size: 22px; font-weight: 300; color: var(--purple); }
+
+/* ── Breadcrumbs ── */
+.crumbs { font-size: 14px; margin-bottom: 20px; color: var(--muted); }
+.crumbs a { color: var(--purple); text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+
+/* ── Buttons (sub-pages) ── */
+.btn {
+  display: inline-block; padding: 10px 18px;
+  background: var(--purple); color: #fff; border: 2px solid var(--purple);
+  font-size: 16px; font-weight: bold; cursor: pointer;
+  text-decoration: none; font-family: inherit; border-radius: 3px;
+}
+.btn:hover { background: var(--purple-dark); border-color: var(--purple-dark); color: #fff; }
+.btn.secondary { background: #fff; color: var(--purple); border-color: var(--purple); }
+.btn.secondary:hover { background: #f5f5f5; }
+.btn.small { padding: 6px 12px; font-size: 14px; }
+.btn.danger { background: var(--red); border-color: var(--red); color: #fff; }
+
+/* ── Sub-page form rows ── */
+.row { display: flex; flex-direction: column; margin-bottom: 20px; max-width: 500px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid .full { grid-column: 1 / -1; }
+@media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+.row label, .grid label {
+  display: block; font-size: 16px; font-weight: bold; margin-bottom: 5px; color: var(--text);
+}
+.row input, .row textarea, .grid input, .grid textarea, .grid select {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--border);
+  border-radius: 2px; font-size: 16px; font-family: inherit; background: #fff;
+}
+.row input:focus, .row textarea:focus, .grid input:focus, .grid textarea:focus {
+  outline: none; border-color: var(--focus);
+  box-shadow: 0 0 0 2px rgba(127,182,232,0.4);
+}
+textarea { resize: vertical; }
+
+/* ── Info box ── */
+.info-box {
+  background: #fff7bf; border-left: 6px solid #e8c100;
+  padding: 15px; margin: 16px 0; font-size: 16px;
+}
+
+/* ── Panel ── */
+.panel {
+  background: #fff; border: 1px solid var(--border);
+  padding: 14px; margin-top: 10px; white-space: pre-wrap; font-size: 16px; line-height: 1.5;
+}
+
+/* ── Check list ── */
+.check-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.check-list label {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-weight: normal; font-size: 16px; cursor: pointer;
+  padding: 10px; background: #fff; border: 1px solid var(--border);
+}
+.check-list label:hover { border-color: var(--purple); }
+.check-list input[type="checkbox"] {
+  width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px;
+  accent-color: var(--purple);
+}
+
+/* ── Success box ── */
+.success-box {
+  background: #00703c; color: #fff;
+  padding: 24px 20px; text-align: center; margin-bottom: 24px;
+}
+.success-box .tick { font-size: 48px; margin-bottom: 10px; }
+.success-box h1 { color: #fff; font-size: 2rem; margin-bottom: 8px; font-weight: 300; }
+.success-box p  { font-size: 16px; opacity: .9; }
+
+/* ── Sub-page actions ── */
+.sub-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; align-items: center; }
+
+/* ── Table ── */
+table { width: 100%; border-collapse: collapse; margin-top: 24px; background: #fff; font-size: 16px; }
+th { background: var(--purple); color: #fff; padding: 10px 8px; text-align: left; }
+td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
+tr:hover td { background: #f9f9f9; }
+
+/* ── Footer ── */
+footer.site-footer { background: #e8e5e0; padding: 40px 32px 0; margin-top: 40px; }
+.footer-cols {
+  display: flex; flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+}
+.footer-cols > div { flex: 1; min-width: 160px; }
+.footer-cols h4 {
+  font-weight: 400; font-size: 1.2rem; color: #444;
+  margin: 0 0 12px; border-bottom: 1px solid #ccc; padding-bottom: 10px;
+}
+.footer-cols ul { list-style: none; }
+.footer-cols li { padding: 5px 0; color: #555; font-size: 0.9rem; }
+.footer-social { display: flex; gap: 10px; margin-top: 12px; }
+.footer-social a {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 4px;
+  color: #fff; font-size: 18px; text-decoration: none;
+}
+.footer-social a.twitter { background: #1da1f2; }
+.footer-social a.facebook { background: #1877f2; }
+.footer-social a:hover { opacity: 0.85; }
+.footer-bottom {
+  background: #e8e5e0; color: #555;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 0; font-size: 0.85rem; margin-top: 30px;
+  border-top: 1px solid #ccc;
+}
+.footer-bottom a { color: #555; }

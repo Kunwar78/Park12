@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin - [Authority Name]</title><link rel="stylesheet" href="style.css"></head><body>
+<header><div class="name">[AUTHORITY NAME]</div><div class="sub">ADMIN</div></header>
+<div class="band"></div>
+<main>
+ <h1>Manage records</h1>
+ <form id="f" class="grid">
+  <div><label>Reg number *</label><input name="vrn" required></div>
+  <div><label>PCN number *</label><input name="pcn" required></div>
+  <div><label>Date</label><input name="date" type="date"></div>
+  <div><label>Time</label><input name="time" type="time"></div>
+  <div><label>Make</label><input name="make"></div>
+  <div><label>Colour</label><input name="colour"></div>
+  <div class="full"><label>Was seen in (location)</label><input name="location"></div>
+  <div class="full"><label>Contravention</label><input name="contravention"></div>
+  <div class="full"><label>Additional details / evidence text</label><textarea name="additional" rows="3"></textarea></div>
+  <div class="full"><button type="submit" class="btn" id="saveBtn">Add record</button>
+   <button type="button" class="btn small" id="cancel" hidden>Cancel edit</button></div>
+ </form>
+ <div class="err" id="err"></div>
+ <table><thead><tr><th>Reg</th><th>PCN</th><th>Date</th><th>Make</th><th>Location</th><th></th></tr></thead><tbody id="rows"></tbody></table>
+</main>
+<script>
+const f = document.getElementById('f'), tb = document.getElementById('rows'), err = document.getElementById('err');
+const saveBtn = document.getElementById('saveBtn'), cancel = document.getElementById('cancel');
+let rows = [], editId = null;
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function load(){
+  try {
+    const res = await fetch('/api/admin/records');
+    if (!res.ok) { err.textContent = 'Could not load records (' + res.status + ')'; return; }
+    rows = await res.json(); render();
+  } catch (e) { err.textContent = 'Could not load records.'; }
+}
+function render(){
+  tb.innerHTML = rows.map(r => `<tr><td>${esc(r.vrn)}</td><td>${esc(r.pcn)}</td><td>${esc(r.date)}</td><td>${esc(r.make)}</td><td>${esc(r.location)}</td>
+   <td><button class="btn small" onclick="edit(${r.id})">Edit</button> <button class="btn small danger" onclick="del(${r.id})">Delete</button></td></tr>`).join('');
+}
+window.edit = id => { const r = rows.find(x => x.id === id); if (!r) return; editId = id;
+  for (const [k,v] of Object.entries(r)) if (f.elements[k]) f.elements[k].value = v;
+  saveBtn.textContent = 'Save changes'; cancel.hidden = false; scrollTo(0,0); };
+window.del = async id => { if (!confirm('Delete this record?')) return;
+  await fetch('/api/admin/records/' + id, {method:'DELETE'}); load(); };
+function reset(){ f.reset(); editId = null; saveBtn.textContent = 'Add record'; cancel.hidden = true; }
+cancel.onclick = reset;
+
+f.addEventListener('submit', async e => {
+  e.preventDefault(); err.textContent = '';
+  const body = Object.fromEntries(new FormData(f));
+  try {
+    const r = await fetch(editId ? '/api/admin/records/' + editId : '/api/admin/records',
+      {method: editId ? 'PUT' : 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    if (!r.ok) { let m = 'Error ' + r.status; try { m = (await r.json()).error || m; } catch(_){} err.textContent = m; return; }
+    reset(); load();
+  } catch (e) { err.textContent = 'Could not save record.'; }
+});
+load();
+</script></body></html>
